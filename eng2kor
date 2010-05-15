@@ -16,13 +16,12 @@ GetOptions(\%options, "--help");
 run(\%options, @ARGV);
 
 sub run {
-    my($opts, @args) = @_;
+    my($opts, @words) = @_;
 
     if ($opts->{help}) {
         pod2usage(0);
     }
 
-	my @words = @args;
 	for my $word (@words) {
 		my @kor = post_naver($word);
 		for my $kor (@kor) {
