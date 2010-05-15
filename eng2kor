@@ -3,9 +3,12 @@
 use warnings;
 use strict;
 use LWP::Simple qw/get/;
+use WWW::Mechanize;
 use Getopt::Long;
 use Pod::Usage;
-use constant NAVER_DICTIONARY_URL => "http://endic.naver.com/search.nhn?isOnlyViewEE=N&query=";
+use constant {
+	NAVER_DICTIONARY_URL => "http://endic.naver.com/search.nhn?isOnlyViewEE=N&query=", 
+};
 binmode(STDOUT, ":utf8");
 
 our $VERSION = '0.01';
@@ -25,12 +28,10 @@ sub run {
 	if (@words == 0) {
 		push @words, join '', <STDIN>;
 	}
+
 	for my $word (@words) {
 		my @kor = get_naver($word);
-		for my $kor (@kor) {
-			$kor =~ s/<[^>]*>//g;
-			print $kor, "\n";
-		}
+		print join("\n", @kor), "\n";
 	}
 }
 
@@ -38,6 +39,7 @@ sub get_naver {
     my $word = shift;
 	my $html = get(NAVER_DICTIONARY_URL . url_encode($word));
 	my @kor = $html =~ m{<span class="fnt_k05">([^<].*?)</span>}sg;
+	map { s/<[^>]*>//g } @kor;
 	return @kor;
 }
 
