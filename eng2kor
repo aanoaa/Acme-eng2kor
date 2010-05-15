@@ -24,7 +24,7 @@ sub run {
 
 	my @words = @args;
 	for my $word (@words) {
-		my @kor = post_google($word);
+		my @kor = post_naver($word);
 		for my $kor (@kor) {
 			$kor =~ s/<[^>]*>//g;
 			print $kor, "\n";
@@ -32,7 +32,7 @@ sub run {
 	}
 }
 
-sub post_google {
+sub post_naver {
     my $word = shift;
 	my $html = get(NAVER_DICTIONARY_URL . url_encode($word));
 	my @kor = $html =~ m{<span class="fnt_k05">([^<].*?)</span>}sg;
