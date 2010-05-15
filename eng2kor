@@ -22,6 +22,9 @@ sub run {
         pod2usage(0);
     }
 
+	if (@words == 0) {
+		push @words, join '', <STDIN>;
+	}
 	for my $word (@words) {
 		my @kor = post_naver($word);
 		for my $kor (@kor) {
@@ -65,6 +68,7 @@ Version 0.01
 
 	eng2kor "word"
 	eng2kor some thing "something"
+	echo "word" | eng2kor
 
 =head1 INSTALL
 
