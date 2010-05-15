@@ -26,7 +26,7 @@ sub run {
 		push @words, join '', <STDIN>;
 	}
 	for my $word (@words) {
-		my @kor = get_naver($word);
+		my @kor = post_naver($word);
 		for my $kor (@kor) {
 			$kor =~ s/<[^>]*>//g;
 			print $kor, "\n";
@@ -34,7 +34,7 @@ sub run {
 	}
 }
 
-sub get_naver {
+sub post_naver {
     my $word = shift;
 	my $html = get(NAVER_DICTIONARY_URL . url_encode($word));
 	my @kor = $html =~ m{<span class="fnt_k05">([^<].*?)</span>}sg;
