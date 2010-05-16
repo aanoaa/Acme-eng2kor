@@ -11,7 +11,7 @@ use constant {
 };
 binmode(STDOUT, ":utf8");
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %options;
 GetOptions(\%options, "--help");
@@ -64,7 +64,7 @@ Dictionary Service, it using naver dictionary
 
 =head1 VERSION
 
-Version 0.01
+Version $VERSION
 
 =head1 SYNOPSIS
 
@@ -83,8 +83,6 @@ Version 0.01
 hshong, C<< <hshong at perl.kr> >>
 
 =head1 LICENSE AND COPYRIGHT
-
-Copyright 2010 hshong.
 
 same as Perl.
 
