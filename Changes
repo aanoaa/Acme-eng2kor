@@ -1,4 +1,8 @@
 Revision history for eng2kor
+0.03	2010/05/22
+		naver 에서 daum 사전으로 바꿨음
+		Term::ANSIColor 를 사용해서 보기 편하게 했음
+		미국사람은 이거 쓸일 없을 거 같아서 한글을 적극적으로 사용
 
 0.02	Date/Time
 		internal refactor
