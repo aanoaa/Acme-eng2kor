@@ -62,7 +62,7 @@ Version $VERSION
 
 =head1 SYNOPSIS
 
-	DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6		# note: invalid key
+	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6		# note: invalid key
 	eng2kor "word"
 	eng2kor some thing "something"
 	echo "word" | eng2kor

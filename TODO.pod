@@ -1,0 +1,27 @@
+=encoding utf8
+
+=head1 이름
+
+TODO - 목록
+
+=head1 기능
+
+=head2 문장번역
+
+	eng2kor "this is english sentence"
+
+=head3 option으로 파일명을 받아서 문장번역
+
+	eng2kor --file=eng.txt
+
+=head2 more 결과
+
+편리한 사용을 위해 지금처럼 간단한 결과만 보여줄 것인가.
+예제 및 발음기호도 보여줄 것인가를 선택해서 추가하든지 말든지
+
+=head2 API 키 없이 사용
+
+API키를 설정하고 쓰는게 불편하다.
+꼼수를 써서 API없이 사용할 수 있는 방법을 찾아보자
+
+=cut

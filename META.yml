@@ -16,6 +16,7 @@ name: eng2kor
 no_index:
   directory:
     - inc
+    - t
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.01
+version: 0.03

@@ -1,0 +1,6 @@
+*.bak
+Makefile.old
+MANIFEST.bak
+ignore.txt
+blib
+pm_to_blib

@@ -17,7 +17,7 @@ EOF
 if !$ENV{DAUM_ENDIC_KEY};
 
 SKIP: {
-	skip "API 키가 없으면 테스트 할 수 없습니다.", 1 if !$ENV{DAUM_ENDIC_KEY};
+	skip "API 키가 없으면 테스트 할 수 없습니다.", 4 if !$ENV{DAUM_ENDIC_KEY};
 	my $url = "http://apis.daum.net/dic/endic?apikey=43b0914a71fc49af62ad3ea6521d95400c308805&kind=WORD&output=json&q=some";
 	my $ua = LWP::UserAgent->new;
 	my $res = $ua->request(GET $url);

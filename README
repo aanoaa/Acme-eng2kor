@@ -1,20 +1,28 @@
-eng2kor
+NAME
+    eng2kor - English to Korean Dictionary Service, it using daum english
+    dictionary api
 
-	perl eng2kor --help
+VERSION
+    Version $VERSION
 
-DESCRIPTION
+SYNOPSIS
+            export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6          # note: invalid key
+            eng2kor "word"
+            eng2kor some thing "something"
+            echo "word" | eng2kor
 
-터미널에서 영단어를 한글로 보자.
+INSTALL
+            perl Makefile.PL
+            make
+            make test
+            make install
 
-INSTALLATION
-
-To install this module, run the following commands:
-
-	perl Makefile.PL
-	make
-	make test
-	make install
+AUTHOR
+    hshong, "<hshong at perl.kr>"
 
 LICENSE AND COPYRIGHT
+    same as Perl.
 
-same as Perl.
+SEE ALSO
+    <http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11>
+
