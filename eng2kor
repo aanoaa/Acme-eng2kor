@@ -5,6 +5,7 @@ use LWP::Simple qw/get/;
 use Getopt::Long;
 use Pod::Usage;
 use JSON;
+use utf8;
 use Term::ANSIColor qw/:constants/;
 use constant {
 	DAUM_ENDIC_URL => "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s"
