@@ -18,7 +18,7 @@ use constant {
 	DAUM_ENDIC_URL => "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s"
 };
 
-our $VERSION = '0.06';
+our $VERSION = '1.00';
 
 my %options;
 GetOptions(\%options, "--file=s", "--help");
