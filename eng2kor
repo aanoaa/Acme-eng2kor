@@ -70,6 +70,7 @@ Version $VERSION
 =head1 SYNOPSIS
 
 	eng2kor "word"
+	eng2kor 가나다														# kor2eng
 	eng2kor some thing "something"
 	echo "word" | eng2kor
 	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6		# note: 개인 키를 발급받아서 사용하는걸 권장, 유효한 키가 아님

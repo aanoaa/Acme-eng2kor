@@ -1,4 +1,9 @@
 Revision history for eng2kor
+0.05	2010/05/22
+		한글 단어 입력시 영어 단어 표시
+		DEMO KEY 사용으로 API KEY 의존성을 없앴음
+		@ARGV 를 utf8 로 출력했을때, 깨져보이는 버그 수정
+
 0.03	2010/05/22
 		naver 에서 daum 사전으로 바꿨음
 		Term::ANSIColor 를 사용해서 보기 편하게 했음
@@ -9,4 +14,3 @@ Revision history for eng2kor
 
 0.01    2010/05/15
         First version, released on an unsuspecting world.
-
