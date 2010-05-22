@@ -54,6 +54,7 @@ sub run {
 			die "response status failure" if $res->responseStatus != 200;
 			my $translated = $res->responseData->translatedText;
 			print "\t$translated\n";
+			next;
 		}
 
 		my $result = from_json(get_daum($word));
