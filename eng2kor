@@ -1,16 +1,20 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
+use utf8;
+binmode(STDOUT, ":utf8");
 use LWP::Simple qw/get/;
 use Getopt::Long;
 use Pod::Usage;
 use JSON;
-use utf8;
 use Term::ANSIColor qw/:constants/;
+use I18N::Langinfo qw(langinfo CODESET);
+my $codeset = langinfo(CODESET);
+use Encode qw(decode);
+@ARGV = map { decode $codeset, $_ } @ARGV;
 use constant {
 	DAUM_ENDIC_URL => "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s"
 };
-binmode(STDOUT, ":utf8");
 
 our $VERSION = '0.03';
 
@@ -32,7 +36,7 @@ sub run {
 
 	for my $word (@words) {
 		local $Term::ANSIColor::AUTORESET = 1;
-		print BOLD BLUE "$word", "\n";
+		print BOLD BLUE $word, "\n";
 		my $result = from_json(get_daum($word));
 		for my $word (@{ $result->{channel}->{item} }) {
 			print "$word->{title}\n";
