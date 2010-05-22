@@ -1,12 +1,14 @@
 NAME
-    eng2kor - English to Korean Dictionary Service, it using daum english
-    dictionary api
+    eng2kor - English to Korean Dictionary Service
+
+    Daum 에서 사� � API key를 발급받아서 사용하기를
+    권장합니다.
 
 VERSION
     Version $VERSION
 
 SYNOPSIS
-            export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6          # note: invalid key
+            export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6          # note: invalid key & 권장
             eng2kor "word"
             eng2kor some thing "something"
             echo "word" | eng2kor

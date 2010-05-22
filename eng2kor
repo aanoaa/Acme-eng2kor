@@ -16,7 +16,7 @@ use constant {
 	DAUM_ENDIC_URL => "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s"
 };
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my %options;
 GetOptions(\%options, "--help");
@@ -59,7 +59,9 @@ __END__
 =head1 NAME
 
 eng2kor - English to Korean
-Dictionary Service, it using daum english dictionary api
+Dictionary Service
+
+Daum 에서 사전 API key를 발급받아서 사용하기를 권장합니다.
 
 =head1 VERSION
 
@@ -67,7 +69,7 @@ Version $VERSION
 
 =head1 SYNOPSIS
 
-	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6		# note: invalid key
+	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6		# note: invalid key & 권장
 	eng2kor "word"
 	eng2kor some thing "something"
 	echo "word" | eng2kor
