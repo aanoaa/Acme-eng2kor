@@ -48,7 +48,7 @@ sub run {
 sub get_daum {
     my $word = shift;
 	unless ($ENV{DAUM_ENDIC_KEY}) {
-		die "this service required daum dictionary api key. See http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11";
+		$ENV{DAUM_ENDIC_KEY} = 'DAUM_DIC_DEMO_APIKEY';
 	}
 	my $url = sprintf(DAUM_ENDIC_URL, $ENV{DAUM_ENDIC_KEY}, $word);
 	return get($url);
