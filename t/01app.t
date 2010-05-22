@@ -1,12 +1,16 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More tests => 4;
+#use Test::More tests => 4;
+use Test::More qw/no_plan/;
 
 use LWP::UserAgent;
 use HTTP::Headers;
 use HTTP::Request::Common;
 use HTTP::Response;
+use REST::Google::Translate;
+use utf8;
+binmode(STDOUT, ":utf8");
 
 diag <<EOF
 ********************************* WARNING *********************************
@@ -22,6 +26,7 @@ my $url = "http://apis.daum.net/dic/endic?apikey=43b0914a71fc49af62ad3ea6521d954
 my $ua = LWP::UserAgent->new;
 my $res = $ua->request(GET $url);
 
+# daum api
 ok( $res = $ua->request(GET $url), 'JSON 데이터 요청' );
 ok( $res->is_success, '200 OK' );
 TODO: {
@@ -29,3 +34,15 @@ TODO: {
 	is( $res->content_type, 'application/json', 'JSON content type' );
 }
 like( $res->content, qr/some/, "요청한 단어를 포함" );
+
+# google translate
+BEGIN { use_ok( 'REST::Google::Translate' ); }
+REST::Google::Translate->http_referer('http://localhost');
+$res = REST::Google::Translate->new(
+	q => "hello, world", 
+	langpair => 'en|ko', 
+);
+my $translated = $res->responseData->translatedText;
+
+is( $res->responseStatus, 200, 'google translate 200 OK');
+like( $translated, qr/안녕하세요/, "요청한 문장을 번역" );

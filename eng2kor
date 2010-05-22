@@ -8,6 +8,8 @@ use Getopt::Long;
 use Pod::Usage;
 use JSON;
 use Term::ANSIColor qw/:constants/;
+use File::Slurp qw/slurp/;
+use REST::Google::Translate;
 use I18N::Langinfo qw(langinfo CODESET);
 my $codeset = langinfo(CODESET);
 use Encode qw(decode);
@@ -16,10 +18,10 @@ use constant {
 	DAUM_ENDIC_URL => "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s"
 };
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my %options;
-GetOptions(\%options, "--help");
+GetOptions(\%options, "--file=s", "--help");
 
 run(\%options, @ARGV);
 
@@ -30,6 +32,10 @@ sub run {
         pod2usage(0);
     }
 
+	if ($opts->{file}) {
+		unshift @words, scalar slurp($opts->{file});
+	}
+
 	if (@words == 0) {
 		push @words, join '', <STDIN>;
 	}
@@ -37,6 +43,19 @@ sub run {
 	for my $word (@words) {
 		local $Term::ANSIColor::AUTORESET = 1;
 		print BOLD BLUE $word, "\n";
+
+		if ($word =~ m/\w+ \w+/) {
+			REST::Google::Translate->http_referer('http://localhost');
+			my $res = REST::Google::Translate->new(
+				q => $word,
+				langpair => 'en|ko'
+			);
+
+			die "response status failure" if $res->responseStatus != 200;
+			my $translated = $res->responseData->translatedText;
+			print "\t$translated\n";
+		}
+
 		my $result = from_json(get_daum($word));
 		for my $word (@{ $result->{channel}->{item} }) {
 			print "$word->{title}\n";
@@ -69,10 +88,14 @@ Version $VERSION
 
 =head1 SYNOPSIS
 
+	eng2kor --help
+
 	eng2kor "word"
 	eng2kor 가나다														# kor2eng
-	eng2kor some thing "something"
-	echo "word" | eng2kor
+	eng2kor some thing "something"										# 여러개를 한방에
+	eng2kor "some thing"												# 문장번역
+	echo "word" | eng2kor												# pipe input
+	eng2kor --file=eng.txt												# 파일 번역
 	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6		# note: 개인 키를 발급받아서 사용하는걸 권장, 유효한 키가 아님
 
 =head1 INSTALL

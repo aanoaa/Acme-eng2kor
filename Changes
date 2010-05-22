@@ -1,4 +1,9 @@
 Revision history for eng2kor
+0.06	2010/05/22
+		문장번역
+		파일번역
+		문장, 파일번역은 kor2eng 안됨
+
 0.05	2010/05/22
 		한글 단어 입력시 영어 단어 표시
 		DEMO KEY 사용으로 API KEY 의존성을 없앴음
