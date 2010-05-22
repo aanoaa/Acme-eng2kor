@@ -1,8 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-#use Test::More tests => 4;
-use Test::More qw/no_plan/;
+use Test::More tests => 7;
 
 use LWP::UserAgent;
 use HTTP::Headers;
