@@ -28,7 +28,7 @@ my $res = $ua->request(GET $url);
 ok( $res = $ua->request(GET $url), 'JSON 데이터 요청' );
 ok( $res->is_success, '200 OK' );
 TODO: {
-	local $TODO = "json 으로 응답이 오긴했지만, 현재의 content-type은 text/plain";
+	local $TODO = "json 으로 응답이 오긴했지만, 현재의 content-type은 application/json 이 아님";
 	is( $res->content_type, 'application/json', 'JSON content type' );
 }
 like( $res->content, qr/some/, "요청한 단어를 포함" );
@@ -39,7 +39,7 @@ $url = 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=some
 ok( $res = $ua->request(GET $url), 'JSON 데이터 요청' );
 ok( $res->is_success, '200 OK' );
 TODO: {
-	local $TODO = "json 으로 응답이 오긴했지만, 현재의 content-type은 text/plain";
+	local $TODO = "json 으로 응답이 오긴했지만, 현재의 content-type은 application/json 이 아님";
 	is( $res->content_type, 'application/json', 'JSON content type' );
 }
 like( $res->content, qr/responseData/, "응답성공" );
