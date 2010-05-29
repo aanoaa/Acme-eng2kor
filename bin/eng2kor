@@ -33,6 +33,23 @@ eng2kor - English to Korean Dictionary for tty
 	eng2kor --file=eng.txt                                              # file
 	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # note: just sample, invalid key
 
+=head1 SEE ALSO
+
+* L<http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11>
+
+* L<http://code.google.com/intl/en/apis/ajaxlanguage/>
+
+=head1 AUTHOR
+
+  hshong <hshong@perl.kr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by hshong.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
 
 1; # End of eng2kor
