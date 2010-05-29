@@ -17,7 +17,7 @@ use constant {
 
 binmode STDOUT, 'utf8';
 
-our $VERSION = '1.0003';
+our $VERSION = '1.0004';
 $VERSION = eval $VERSION;
 
 sub run_command {
@@ -28,6 +28,7 @@ sub run_command {
 
 sub run_command_exec {
     my($self, @words) = @_;
+	unshift @words, scalar slurp $self->{file} if $self->{file};
 	local $Term::ANSIColor::AUTORESET = 1;
 	for my $word (@words) {
 		my $trim_word = $word;
