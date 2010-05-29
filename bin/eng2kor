@@ -9,7 +9,7 @@ require App::eng2kor;
 
 my %options;
 GetOptions(\%options, "--file=s", "--lang=s", "--help");
-pod2usage(0) if $options{help};
+pod2usage(0, -noperldoc => 1) if $options{help};
 my $codeset = langinfo(CODESET);
 @ARGV = map { decode $codeset, $_ } @ARGV;
 $options{lang} ||= 'en|ko';

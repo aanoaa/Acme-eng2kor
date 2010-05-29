@@ -17,7 +17,7 @@ use constant {
 
 binmode STDOUT, 'utf8';
 
-our $VERSION = '1.0002';
+our $VERSION = '1.0003';
 $VERSION = eval $VERSION;
 
 sub run_command {
