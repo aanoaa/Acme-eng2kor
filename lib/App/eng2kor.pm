@@ -100,11 +100,11 @@ __END__
 	eng2kor --help
 
 	eng2kor "english"                                                   # eng2kor
-	eng2kor 한쿡말                                                      # kor2eng
 	eng2kor some thing "something"                                      # multiple
 	eng2kor "this is sentence"                                          # sentence
-	echo "word" | eng2kor                                               # pipe input
+	eng2kor --lang='ko|en' 한쿡말                                       # kor2eng
 	eng2kor --file=eng.txt                                              # file
+	echo "word" | eng2kor                                               # pipe input
 	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # note: just sample, invalid key
 
 =head1 INSTALL
