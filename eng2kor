@@ -56,7 +56,6 @@ sub run {
 			while (my ($key, $value) = each %{ $translated }) {
 				print "$key\n";
 				print "\t$value\n";
-				print "끗!\n";
 			}
 		}
 	}
@@ -72,7 +71,7 @@ sub get_google {
 sub get_daum {
     my ($origin, $lang) = @_;
 	$ENV{DAUM_ENDIC_KEY} = 'DAUM_DIC_DEMO_APIKEY' unless $ENV{DAUM_ENDIC_KEY};
-	my $url = sprintf(DAUM_ENDIC_URL, $ENV{DAUM_ENDIC_KEY}, $origin);
+	my $url = url_encode(sprintf(DAUM_ENDIC_URL, $ENV{DAUM_ENDIC_KEY}, $origin));
 	my $translated = get_translated($url, $lang);
 	my %translated;
 	for my $translated_item (@{ $translated->{channel}->{item} }) {
@@ -88,7 +87,8 @@ sub get_translated {
 	my $ua = LWP::UserAgent->new;
 	my $response = $ua->request($request);
 	print STDERR $response->status_line, "\n" unless $response->is_success;
-	return from_json($response->content, utf8 => 1);
+	#return from_json($response->content, utf8 => 1);
+	return decode_json($response->content);
 }
 
 sub url_encode {
