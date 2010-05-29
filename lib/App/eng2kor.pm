@@ -1,62 +1,52 @@
-#!/usr/bin/env perl
-use warnings;
+package App::eng2kor;
+
 use strict;
+use warnings;
+use 5.8.0;
 use utf8;
 use JSON;
-use Pod::Usage;
-use Getopt::Long;
 use HTTP::Request;
 use HTTP::Response;
 use LWP::UserAgent;
-use Encode qw(decode);
 use File::Slurp qw/slurp/;
 use Term::ANSIColor qw/:constants/;
-use I18N::Langinfo qw(langinfo CODESET);
 use constant {
 	DAUM_ENDIC_URL => "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s", 
 	GOOGLE_TRANSLATE_API_URL => 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s', 
 };
 
+binmode STDOUT, 'utf8';
+
 our $VERSION = '1.0001';
 $VERSION = eval $VERSION;
 
-binmode STDOUT, ":utf8";
+sub run_command {
+    my ( undef, $opt, @args ) = @_;
+    my $self = bless $opt, __PACKAGE__;
+    $self->run_command_exec(@args);
+}
 
-my %options;
-GetOptions(\%options, "--file=s", "--lang=s", "--help");
-my $codeset = langinfo(CODESET);
-@ARGV = map { decode $codeset, $_ } @ARGV;
-run(\%options, @ARGV);
+sub run_command_exec {
+    my($self, @words) = @_;
+	local $Term::ANSIColor::AUTORESET = 1;
+	for my $word (@words) {
+		my $trim_word = $word;
+		$trim_word =~ s/\s+//g;
+		next unless length $trim_word;
 
-sub run {
-    my($opts, @words) = @_;
-	pod2usage(0) if $opts->{help};
-	my $lang = $opts->{lang} || 'en|ko';
-	unshift @words, scalar slurp($opts->{file}) if $opts->{file};
-	push(@words, join '', <STDIN>) if scalar @words eq 0;
+		print BOLD BLUE $word, "\n";
 
-	{
-		use Data::Dumper qw/Dumper/;
-		local $Term::ANSIColor::AUTORESET = 1;
-		for my $word (@words) {
-			my $trim_word = $word;
-			$trim_word =~ s/\s+//g;
-			next unless length $trim_word;
+		my $translated;
+		$translated = get_google($word, $self->{lang});
+		while (my ($key, $value) = each %{ $translated }) {
+			print "$key\n";
+			print "\t$value\n";
+		}
 
-			print BOLD BLUE $word, "\n";
-
-			my $translated;
-			$translated = get_google($word, $lang);
-			while (my ($key, $value) = each %{ $translated }) {
-				print "$key\n";
-				print "\t$value\n";
-			}
-
-			$translated = get_daum($word);
-			while (my ($key, $value) = each %{ $translated }) {
-				print "$key\n";
-				print "\t$value\n";
-			}
+		$translated = get_daum($word);
+		while (my ($key, $value) = each %{ $translated }) {
+			print "$key\n";
+			print "\t$value\n";
 		}
 	}
 }
@@ -105,19 +95,12 @@ sub url_decode {
 
 __END__
 
-=head1 NAME
-
-eng2kor - English to Korean
-Dictionary Service
-
-=head1 POWERED BY Google & Daum
-
 =head1 SYNOPSIS
 
 	eng2kor --help
 
-	eng2kor english														# eng2kor
-	eng2kor 한국말                                                 	    # kor2eng
+	eng2kor "english"                                                   # eng2kor
+	eng2kor 한쿡말                                                      # kor2eng
 	eng2kor some thing "something"                                      # multiple
 	eng2kor "this is sentence"                                          # sentence
 	echo "word" | eng2kor                                               # pipe input
@@ -135,6 +118,8 @@ Dictionary Service
 
 * L<http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11>
 
+* L<http://code.google.com/intl/en/apis/ajaxlanguage/>
+
 =cut
 
-1; # End of eng2kor
+1;
