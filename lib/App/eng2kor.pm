@@ -11,8 +11,10 @@ use LWP::UserAgent;
 use File::Slurp qw/slurp/;
 use Term::ANSIColor qw/:constants/;
 use constant {
-	DAUM_ENDIC_URL => "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s", 
-	GOOGLE_TRANSLATE_API_URL => 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s', 
+    DAUM_ENDIC_URL =>
+      "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s",
+    GOOGLE_TRANSLATE_API_URL =>
+'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s',
 };
 
 binmode STDOUT, 'utf8';
@@ -27,72 +29,73 @@ sub run_command {
 }
 
 sub run_command_exec {
-    my($self, @words) = @_;
-	unshift @words, scalar slurp $self->{file} if $self->{file};
-	push @words, join '', <STDIN> if @words == 0;
-	local $Term::ANSIColor::AUTORESET = 1;
-	for my $word (@words) {
-		my $trim_word = $word;
-		$trim_word =~ s/\s+//g;
-		next unless length $trim_word;
+    my ( $self, @words ) = @_;
+    unshift @words, scalar slurp $self->{file} if $self->{file};
+    push @words, join '', <STDIN> if @words == 0;
+    local $Term::ANSIColor::AUTORESET = 1;
+    for my $word (@words) {
+        my $trim_word = $word;
+        $trim_word =~ s/\s+//g;
+        next unless length $trim_word;
 
-		print BOLD BLUE $word, "\n";
+        print BOLD BLUE $word, "\n";
 
-		my $translated;
-		$translated = get_google($word, $self->{lang});
-		while (my ($key, $value) = each %{ $translated }) {
-			print "$key\n";
-			print "\t$value\n";
-		}
+        my $translated;
+        $translated = get_google( $word, $self->{lang} );
+        while ( my ( $key, $value ) = each %{$translated} ) {
+            print "$key\n";
+            print "\t$value\n";
+        }
 
-		$translated = get_daum($word);
-		while (my ($key, $value) = each %{ $translated }) {
-			print "$key\n";
-			print "\t$value\n";
-		}
-	}
+        $translated = get_daum($word);
+        while ( my ( $key, $value ) = each %{$translated} ) {
+            print "$key\n";
+            print "\t$value\n";
+        }
+    }
 }
 
 sub get_google {
-	my ($origin, $lang) = @_;
-	my $url = url_encode(sprintf(GOOGLE_TRANSLATE_API_URL, $origin, $lang));
-	my $translated = get_translated($url, $lang);
-	return { $origin => $translated->{responseData}->{translatedText} };
+    my ( $origin, $lang ) = @_;
+    my $url = url_encode( sprintf( GOOGLE_TRANSLATE_API_URL, $origin, $lang ) );
+    my $translated = get_translated( $url, $lang );
+    return { $origin => $translated->{responseData}->{translatedText} };
 }
 
 sub get_daum {
-    my ($origin, $lang) = @_;
-	$ENV{DAUM_ENDIC_KEY} = 'DAUM_DIC_DEMO_APIKEY' unless $ENV{DAUM_ENDIC_KEY};
-	my $url = url_encode(sprintf(DAUM_ENDIC_URL, $ENV{DAUM_ENDIC_KEY}, $origin));
-	my $translated = get_translated($url, $lang);
-	my %translated;
-	for my $translated_item (@{ $translated->{channel}->{item} }) {
-		$translated{ $translated_item->{title} } = $translated_item->{description};
-	}
+    my ( $origin, $lang ) = @_;
+    $ENV{DAUM_ENDIC_KEY} = 'DAUM_DIC_DEMO_APIKEY' unless $ENV{DAUM_ENDIC_KEY};
+    my $url =
+      url_encode( sprintf( DAUM_ENDIC_URL, $ENV{DAUM_ENDIC_KEY}, $origin ) );
+    my $translated = get_translated( $url, $lang );
+    my %translated;
+    for my $translated_item ( @{ $translated->{channel}->{item} } ) {
+        $translated{ $translated_item->{title} } =
+          $translated_item->{description};
+    }
 
-	return \%translated;
+    return \%translated;
 }
 
 sub get_translated {
-	my ($url, $lang) = @_;
-	my $request = HTTP::Request->new(GET => $url);
-	my $ua = LWP::UserAgent->new;
-	my $response = $ua->request($request);
-	print STDERR $response->status_line, "\n" unless $response->is_success;
-	#return from_json($response->content, utf8 => 1);
-	return decode_json($response->content);
+    my ( $url, $lang ) = @_;
+    my $request  = HTTP::Request->new( GET => $url );
+    my $ua       = LWP::UserAgent->new;
+    my $response = $ua->request($request);
+    print STDERR $response->status_line, "\n" unless $response->is_success;
+    return decode_json( $response->content );
 }
 
 sub url_encode {
-	my $url = shift;
-	$url =~ s/([^A-Za-z0-9:\/?&]=)/sprintf("%%%02X", ord($1))/seg;
-	return $url;
+    my $url = shift;
+    $url =~ s/([^A-Za-z0-9:\/?&]=)/sprintf("%%%02X", ord($1))/seg;
+    return $url;
 }
 
 sub url_decode {
-	my $url = shift;
-	$url =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg;
-	return $url;
+    my $url = shift;
+    $url =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg;
+    return $url;
 }
 
 __END__
