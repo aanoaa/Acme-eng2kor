@@ -35,7 +35,7 @@ sub run_command_exec {
         $trim_word =~ s/\s+//g;
         next unless length $trim_word;
 
-        print BOLD BLUE $word, "\n";
+        print BOLD BLUE $word, "\n" unless $^O =~ m/win/i;
 
         my $translated;
         $translated = get_google( $word, $self->{lang} );
