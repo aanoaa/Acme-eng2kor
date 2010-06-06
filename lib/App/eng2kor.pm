@@ -3,7 +3,6 @@ package App::eng2kor;
 use strict;
 use warnings;
 use 5.8.0;
-use utf8;
 use JSON;
 use HTTP::Request;
 use HTTP::Response;
@@ -17,9 +16,7 @@ use constant {
 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s',
 };
 
-binmode STDOUT, 'utf8';
-
-our $VERSION = '1.0005';
+our $VERSION = '1.0006';
 $VERSION = eval $VERSION;
 
 sub run_command {
