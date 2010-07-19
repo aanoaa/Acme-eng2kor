@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+package App::eng2kor;
 use strict;
 use warnings;
 use utf8;
@@ -17,12 +18,11 @@ if ($^O =~ m/win/i) {
 	@ARGV = map { decode('utf8', $_) } @ARGV;
 }
 
-print @ARGV, "\n";
-
 my %options;
-GetOptions( \%options, "--file=s", "--lang=s", "--help" );
+GetOptions( \%options, "--file=s", "--lang=s", "--reverse", "--help" );
 pod2usage( 0, -noperldoc => 1 ) if $options{help};
 $options{lang} ||= 'en|ko';
+$options{lang} = 'ko|en' if $options{reverse};
 App::eng2kor->run_command( \%options, @ARGV );
 
 __END__
@@ -39,6 +39,7 @@ eng2kor - English to Korean Dictionary for tty
 	eng2kor some thing "something"                                      # multiple
 	eng2kor "this is sentence"                                          # sentence
 	eng2kor --lang='ko|en' 한쿡말                                       # kor2eng
+	eng2kor --reverse 한쿡말                                            # kor2eng alias
 	eng2kor --file=eng.txt                                              # file
 	echo "word" | eng2kor                                               # pipe input
 	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # note: just sample, invalid key

@@ -16,7 +16,7 @@ use constant {
 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s',
 };
 
-our $VERSION = '1.0006';
+our $VERSION = '1.0007';
 $VERSION = eval $VERSION;
 
 sub run_command {
@@ -97,6 +97,8 @@ sub url_decode {
 
 __END__
 
+=head1 VERSION
+
 =head1 SYNOPSIS
 
 	eng2kor --help
@@ -105,6 +107,7 @@ __END__
 	eng2kor some thing "something"                                      # multiple
 	eng2kor "this is sentence"                                          # sentence
 	eng2kor --lang='ko|en' 한쿡말                                       # kor2eng
+	eng2kor --reverse 한쿡말                                            # kor2eng alias
 	eng2kor --file=eng.txt                                              # file
 	echo "word" | eng2kor                                               # pipe input
 	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # note: just sample, invalid key
