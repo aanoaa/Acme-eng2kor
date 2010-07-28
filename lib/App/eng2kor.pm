@@ -16,7 +16,7 @@ use constant {
 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s',
 };
 
-our $VERSION = '1.0007';
+our $VERSION = '1.0008';
 $VERSION = eval $VERSION;
 
 sub run_command {
