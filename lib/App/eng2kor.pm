@@ -41,13 +41,13 @@ sub run_command_exec {
         $translated = get_google( $word, $self->{lang} );
         while ( my ( $key, $value ) = each %{$translated} ) {
             print "$key\n";
-            print "\t$value\n";
+            print "\t$value\n" if $value;
         }
 
         $translated = get_daum($word);
         while ( my ( $key, $value ) = each %{$translated} ) {
             print "$key\n";
-            print "\t$value\n";
+            print "\t$value\n" if $value;
         }
     }
 }
