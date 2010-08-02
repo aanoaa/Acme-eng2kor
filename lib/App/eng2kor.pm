@@ -8,7 +8,6 @@ use HTTP::Request;
 use HTTP::Response;
 use LWP::UserAgent;
 use File::Slurp qw/slurp/;
-use Term::ANSIColor qw/:constants/;
 use constant {
     DAUM_ENDIC_URL =>
       "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s",
@@ -16,7 +15,7 @@ use constant {
 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s',
 };
 
-our $VERSION = '1.0008';
+our $VERSION = '1.0009';
 $VERSION = eval $VERSION;
 
 sub run_command {
@@ -35,7 +34,7 @@ sub run_command_exec {
         $trim_word =~ s/\s+//g;
         next unless length $trim_word;
 
-        print BOLD BLUE $word, "\n" unless $^O =~ m/win/i;
+		print "\e[7m$word\e[m\n";
 
         my $translated;
         $translated = get_google( $word, $self->{lang} );
