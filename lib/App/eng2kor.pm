@@ -34,7 +34,7 @@ sub run_command_exec {
         $trim_word =~ s/\s+//g;
         next unless length $trim_word;
 
-		print "\e[7m$word\e[m\n";
+        print "\e[7m$word\e[m\n";
 
         my $translated;
         $translated = get_google( $word, $self->{lang} );

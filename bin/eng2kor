@@ -8,14 +8,15 @@ use Pod::Usage;
 use Getopt::Long;
 require App::eng2kor;
 
-if ($^O =~ m/win/i) {
-	binmode STDIN, ':encoding(euc-kr)';
-	binmode STDOUT, ':encoding(euc-kr)';
-	@ARGV = map { decode('euc-kr', $_) } @ARGV;
-} else {
-	binmode STDIN, ':encoding(UTF-8)';
-	binmode STDOUT, ':encoding(UTF-8)';
-	@ARGV = map { decode('utf8', $_) } @ARGV;
+if ( $^O =~ m/win/i ) {
+    binmode STDIN,  ':encoding(euc-kr)';
+    binmode STDOUT, ':encoding(euc-kr)';
+    @ARGV = map { decode( 'euc-kr', $_ ) } @ARGV;
+}
+else {
+    binmode STDIN,  ':encoding(UTF-8)';
+    binmode STDOUT, ':encoding(UTF-8)';
+    @ARGV = map { decode( 'utf8', $_ ) } @ARGV;
 }
 
 my %options;
