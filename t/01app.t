@@ -46,3 +46,5 @@ TODO: {
     is( $res->content_type, 'application/json', 'JSON content type' );
 }
 like( $res->content, qr/responseData/, "응답성공" );
+
+# argument trim test '', ' ', 

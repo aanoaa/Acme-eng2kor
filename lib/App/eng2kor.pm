@@ -1,84 +1,74 @@
 package App::eng2kor;
 
-use strict;
-use warnings;
-use 5.8.0;
+our $VERSION = '1.010';
+$VERSION = eval $VERSION;
+
+use Any::Moose;
+use Any::Moose '::Util::TypeConstraints';
 use JSON;
+use Const::Fast;
 use HTTP::Request;
 use HTTP::Response;
 use LWP::UserAgent;
 use File::Slurp qw/slurp/;
-use constant {
-    DAUM_ENDIC_URL =>
-      "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s",
-    GOOGLE_TRANSLATE_API_URL =>
-'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s',
-};
+use namespace::autoclean;
 
-our $VERSION = '1.0009';
-$VERSION = eval $VERSION;
+const my $DAUM_ENDIC_URL =>
+  "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s";
+const my $GOOGLE_TRANSLATE_API_URL =>
+"http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s";
 
-sub run_command {
-    my ( undef, $opt, @args ) = @_;
-    my $self = bless $opt, __PACKAGE__;
-    $self->run_command_exec(@args);
-}
+has 'word' => ( is => 'rw', isa => 'Str', default => '' );
 
-sub run_command_exec {
-    my ( $self, @words ) = @_;
-    unshift @words, scalar slurp $self->{file} if $self->{file};
-    push @words, join '', <STDIN> if @words == 0;
-    local $Term::ANSIColor::AUTORESET = 1;
-    for my $word (@words) {
-        my $trim_word = $word;
-        $trim_word =~ s/\s+//g;
-        next unless length $trim_word;
+subtype 'FromTo' => as 'Str' =>
+  where { m/[a-z]{2}|[a-z]{2}/ };  # ko|en, en|ko, ... # 영어 이외엔 안됨
 
-        print "\e[7m$word\e[m\n";
+has 'fromto' => ( is => 'ro', isa => 'FromTo', default => 'en|ko' );
 
-        my $translated;
-        $translated = get_google( $word, $self->{lang} );
-        while ( my ( $key, $value ) = each %{$translated} ) {
-            print "$key\n";
-            print "\t$value\n" if $value;
-        }
+sub translate {
+    my ($self) = @_;
+    map { s/^\s+//g; s/\s+$//g } $self->{word};
+    die "wrong arguemnt\n" unless length $self->{word};
 
-        $translated = get_daum($word);
-        while ( my ( $key, $value ) = each %{$translated} ) {
-            print "$key\n";
-            print "\t$value\n" if $value;
-        }
-    }
+    #print "\e[7m$word\e[m\n";
+    my $google = $self->get_google;
+    my @daum   = $self->get_daum;
+    unshift @daum, $google;
+    return @daum;
 }
 
 sub get_google {
-    my ( $origin, $lang ) = @_;
-    my $url = url_encode( sprintf( GOOGLE_TRANSLATE_API_URL, $origin, $lang ) );
-    my $translated = get_translated( $url, $lang );
-    return { $origin => $translated->{responseData}->{translatedText} };
+    my ($self) = @_;
+    my $url = url_encode(
+        sprintf( $GOOGLE_TRANSLATE_API_URL, $self->{word}, $self->{fromto} ) );
+    my $translated = get_translated($url);
+    return {
+        origin     => $self->{word},
+        translated => $translated->{responseData}->{translatedText}
+    };
 }
 
 sub get_daum {
-    my ( $origin, $lang ) = @_;
+    my ($self) = @_;
     $ENV{DAUM_ENDIC_KEY} = 'DAUM_DIC_DEMO_APIKEY' unless $ENV{DAUM_ENDIC_KEY};
-    my $url =
-      url_encode( sprintf( DAUM_ENDIC_URL, $ENV{DAUM_ENDIC_KEY}, $origin ) );
-    my $translated = get_translated( $url, $lang );
-    my %translated;
-    for my $translated_item ( @{ $translated->{channel}->{item} } ) {
-        $translated{ $translated_item->{title} } =
-          $translated_item->{description};
+    my $url = url_encode(
+        sprintf( $DAUM_ENDIC_URL, $ENV{DAUM_ENDIC_KEY}, $self->{word} ) );
+    my $translated = get_translated($url);
+    my @translated;
+    for my $item ( @{ $translated->{channel}->{item} } ) {
+        push @translated,
+          { origin => $item->{title}, translated => $item->{description} };
     }
 
-    return \%translated;
+    return @translated;
 }
 
 sub get_translated {
-    my ( $url, $lang ) = @_;
+    my ($url) = @_;
     my $request  = HTTP::Request->new( GET => $url );
     my $ua       = LWP::UserAgent->new;
     my $response = $ua->request($request);
-    print STDERR $response->status_line, "\n" unless $response->is_success;
+    die STDERR $response->status_line, "\n" unless $response->is_success;
     return decode_json( $response->content );
 }
 
@@ -94,29 +84,20 @@ sub url_decode {
     return $url;
 }
 
-__END__
+__PACKAGE__->meta->make_immutable;
+1;
 
-=head1 VERSION
+__END__
 
 =head1 SYNOPSIS
 
-	eng2kor --help
-
-	eng2kor "english"                                                   # eng2kor
-	eng2kor some thing "something"                                      # multiple
-	eng2kor "this is sentence"                                          # sentence
-	eng2kor --lang='ko|en' 한쿡말                                       # kor2eng
-	eng2kor --reverse 한쿡말                                            # kor2eng alias
-	eng2kor --file=eng.txt                                              # file
-	echo "word" | eng2kor                                               # pipe input
-	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # note: just sample, invalid key
-
-=head1 INSTALL
-
-	perl Makefile.PL
-	make
-	make test
-	make install
+	my $app = new App::eng2kor(word => 'some');
+	binmode STDOUT, ':encoding(UTF-8)';
+	my @result = $app->translate;
+	for my $item (@result) {
+		print $item->{origin}, "\n";
+		print "\t$item->{translated}\n";
+	}
 
 =head1 SEE ALSO
 
