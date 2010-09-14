@@ -10,7 +10,6 @@ use Const::Fast;
 use HTTP::Request;
 use HTTP::Response;
 use LWP::UserAgent;
-use File::Slurp qw/slurp/;
 use namespace::autoclean;
 
 const my $DAUM_ENDIC_URL =>
@@ -23,14 +22,13 @@ has 'word' => ( is => 'rw', isa => 'Str', default => '' );
 subtype 'FromTo' => as 'Str' =>
   where { m/[a-z]{2}|[a-z]{2}/ };  # ko|en, en|ko, ... # 영어 이외엔 안됨
 
-has 'fromto' => ( is => 'ro', isa => 'FromTo', default => 'en|ko' );
+has 'fromto' => ( is => 'rw', isa => 'FromTo', default => 'en|ko' );
 
 sub translate {
     my ($self) = @_;
     map { s/^\s+//g; s/\s+$//g } $self->{word};
     die "wrong arguemnt\n" unless length $self->{word};
 
-    #print "\e[7m$word\e[m\n";
     my $google = $self->get_google;
     my @daum   = $self->get_daum;
     unshift @daum, $google;

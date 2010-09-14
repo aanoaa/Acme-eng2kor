@@ -1,14 +1,13 @@
 #!/usr/bin/env perl
-package App::eng2kor;
 use strict;
 use warnings;
 use utf8;
-use Encode;
+use Encode qw/encode decode/;
 use Pod::Usage;
 use Getopt::Long;
-require App::eng2kor;
+use App::eng2kor;
 
-if ( $^O =~ m/win/i ) {
+if ( $^O =~ m/win/i ) { # for Windows
     binmode STDIN,  ':encoding(euc-kr)';
     binmode STDOUT, ':encoding(euc-kr)';
     @ARGV = map { decode( 'euc-kr', $_ ) } @ARGV;
@@ -20,11 +19,22 @@ else {
 }
 
 my %options;
-GetOptions( \%options, "--file=s", "--lang=s", "--reverse", "--help" );
+GetOptions( \%options, "--lang=s", "--reverse", "--help" );
 pod2usage( 0, -noperldoc => 1 ) if $options{help};
-$options{lang} ||= 'en|ko';
-$options{lang} = 'ko|en' if $options{reverse};
-App::eng2kor->run_command( \%options, @ARGV );
+
+my $app = App::eng2kor->new;
+$app->fromto('ko|en') if $options{reverse};
+$app->fromto( $options{lang} ) if $options{lang};
+unshift @ARGV, join '', <STDIN> if @ARGV == 0;
+for my $word (@ARGV) {
+    print "\e[7m$word\e[m\n";
+    $app->word($word);
+    my @result = $app->translate;
+    for my $item (@result) {
+        print $item->{origin}, "\n";
+        print "\t$item->{translated}\n";
+    }
+}
 
 __END__
 
@@ -41,7 +51,6 @@ eng2kor - English to Korean Dictionary for tty
 	eng2kor "this is sentence"                                          # sentence
 	eng2kor --lang='ko|en' 한쿡말                                       # kor2eng
 	eng2kor --reverse 한쿡말                                            # kor2eng alias
-	eng2kor --file=eng.txt                                              # file
 	echo "word" | eng2kor                                               # pipe input
 	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # note: just sample, invalid key
 
