@@ -69,6 +69,10 @@ eng2kor - English to Korean Dictionary for tty
 	echo "word" | eng2kor                                               # use STDIN to ARG
 	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # set your own DAUM_ENDIC_KEY    * note: just example, invalid key
 
+	### add below line to your .vimrc
+	set keywordprg=eng2kor                                              # type 'Shift + k' on a word what you find.
+	map <C-e> :!eng2kor                                                 # type 'Ctrl + e'
+
 =head1 SEE ALSO
 
 * L<http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11>
