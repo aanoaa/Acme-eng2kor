@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+package main;
 use strict;
 use warnings;
 use utf8;
@@ -19,17 +20,17 @@ else {
 }
 
 my %options;
-GetOptions( \%options, "--lang=s", "--reverse", "--help" );
+GetOptions( \%options, "--src=s", "--dst=s", "--reverse", "--help", "--list" );
 pod2usage( 0, -noperldoc => 1 ) if $options{help};
-
-my $app = App::eng2kor->new;
-$app->fromto('ko|en') if $options{reverse};
-$app->fromto( $options{lang} ) if $options{lang};
+my $src = $options{src} || $ENV{E2K_SRC} || 'en';
+my $dst = $options{dst} || $ENV{E2K_DST} || 'ko';
+die "src - ENV{E2K_SRC}: $src\ndst - ENV{E2K_DST}: $dst\n" if $options{list};
+($src) = ($dst) if $options{reverse};
+my $app = App::eng2kor->new(src => $src, dst => $dst);
 unshift @ARGV, join '', <STDIN> if @ARGV == 0;
 for my $word (@ARGV) {
     print "\e[7m$word\e[m\n";
-    $app->word($word);
-    my @result = $app->translate;
+    my @result = $app->translate($word);
     for my $item (@result) {
         print $item->{origin}, "\n";
         print "\t$item->{translated}\n";
@@ -44,15 +45,29 @@ eng2kor - English to Korean Dictionary for tty
 
 =head1 SYNOPSIS
 
-	eng2kor --help
+	eng2kor [--help|-h] [--list|-l] [--src|-s] [--dst|-d] [--reverse|-r] ARG[1] ARG[2] .. ARG[N]
+	    --help, -h        show this message
+	    --list, -l        show set src and dst
+	    --src, -s         source lang, default 'en', but you can change default via ENV{E2K_SRC}
+	    --dst, -d         destination lang, default 'ko', but you can change default via ENV{E2K_DST}
+	    --reverse, -r     swap 'src' and 'dst'
 
-	eng2kor "english"                                                   # eng2kor
-	eng2kor some thing "something"                                      # multiple
-	eng2kor "this is sentence"                                          # sentence
-	eng2kor --lang='ko|en' 한쿡말                                       # kor2eng
-	eng2kor --reverse 한쿡말                                            # kor2eng alias
-	echo "word" | eng2kor                                               # pipe input
-	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # note: just sample, invalid key
+	see below command for more detail.
+	$ perldoc -t eng2kor
+	$ perldoc -t App::eng2kor
+
+	### example
+	eng2kor -h                                                          # show help message
+	eng2kor -l                                                          # show set src and dst
+	eng2kor english                                                     # English to Korean
+	eng2kor hello world                                                 # multiple
+	eng2kor "this is a sentence"                                        # sentence
+	eng2kor http://twitter.com/userid/status/12345678910                # twitter translate    * note: only for twitter status
+	eng2kor --src=ko --dst=en 안녕하세요                                # Korean to English
+	eng2kor -s ja こんにちは                                            # Japanese to Korean
+	eng2kor -r 안녕하세요                                               # swap 'src' and 'dst'
+	echo "word" | eng2kor                                               # use STDIN to ARG
+	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # set your own DAUM_ENDIC_KEY    * note: just example, invalid key
 
 =head1 SEE ALSO
 

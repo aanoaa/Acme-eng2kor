@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 9;
 use App::eng2kor;
 use LWP::UserAgent;
 use HTTP::Headers;
@@ -20,11 +20,13 @@ DESC
 
 $ENV{DAUM_ENDIC_KEY} = 'DAUM_DIC_DEMO_APIKEY' if !$ENV{DAUM_ENDIC_KEY};
 my $app;
-ok( $app = App::eng2kor->new(word => 'some'), 'new');
-is( $app->word, 'some', 'origin word');
 my @result;
-ok( @result = $app->translate, 'HTTP REQ/RES' );
-is( $result[0]->{origin}, 'some', 'origin word - 2' );
-ok( $result[0]->{translated}, 'translated' );
-ok( $app->word('foo'), 'change word' );
-ok( @result = $app->translate, 'HTTP REQ/RES - 2' );
+ok( $app = App::eng2kor->new, 'create new instance');
+is( $app->src, 'en', 'src default');
+is( $app->dst, 'ko', 'dst default');
+ok( @result = $app->translate('some'), 'HTTP REQ/RES' );
+ok( $app->src('ko'), 'change src');
+ok( $app->dst('ja'), 'change dst');
+is( $app->src, 'ko', 'src changed corrently');
+is( $app->dst, 'ja', 'dst changed corrently');
+ok( @result = $app->translate('안녕하세요'), 'HTTP REQ/RES' );
