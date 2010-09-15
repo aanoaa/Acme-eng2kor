@@ -1,6 +1,6 @@
 package App::eng2kor;
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 $VERSION = eval $VERSION;
 
 use Any::Moose;
@@ -122,17 +122,6 @@ version 1.010
 * L<http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11>
 
 * L<http://code.google.com/intl/en/apis/ajaxlanguage/>
-
-=head1 AUTHOR
-
-hshong <hshong@perl.kr>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2010 by hshong.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut
 
