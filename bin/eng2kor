@@ -24,8 +24,8 @@ GetOptions( \%options, "--src=s", "--dst=s", "--reverse", "--help", "--list" );
 pod2usage( 0, -noperldoc => 1 ) if $options{help};
 my $src = $options{src} || $ENV{E2K_SRC} || 'en';
 my $dst = $options{dst} || $ENV{E2K_DST} || 'ko';
+($src, $dst) = ($dst, $src) if $options{reverse};
 die "src - ENV{E2K_SRC}: $src\ndst - ENV{E2K_DST}: $dst\n" if $options{list};
-($src) = ($dst) if $options{reverse};
 my $app = App::eng2kor->new(src => $src, dst => $dst);
 unshift @ARGV, join '', <STDIN> if @ARGV == 0;
 for my $word (@ARGV) {
