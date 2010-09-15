@@ -1,6 +1,6 @@
 package App::eng2kor;
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 $VERSION = eval $VERSION;
 
 use Any::Moose;
