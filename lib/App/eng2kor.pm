@@ -1,7 +1,22 @@
 package App::eng2kor;
+# ABSTRACT: English to Korean Translator
 
-our $VERSION = '1.012';
-$VERSION = eval $VERSION;
+=head1 SYNOPSIS
+
+	use App::eng2kor;
+	my $app = new App::eng2kor;
+	binmode STDOUT, ':encoding(UTF-8)';
+	my @result = $app->translate('some');
+	for my $item (@result) {
+		print $item->{origin}, "\n";
+		print "\t$item->{translated}\n";
+	}
+
+=head1 DESCRIPTION
+
+Description here..
+
+=cut
 
 use Any::Moose;
 use Any::Moose '::Util::TypeConstraints';
@@ -26,6 +41,14 @@ subtype 'LangTags' => as 'Str' =>
 has 'src' => ( is => 'rw', isa => 'LangTags', default => 'en' );
 has 'dst' => ( is => 'rw', isa => 'LangTags', default => 'ko' );
 
+=head1 METHODS
+
+=head2 translate
+
+stuff here..
+
+=cut
+
 sub translate {
     my ($self, $word) = @_;
 	map { s/^\s+//; s/\s+$// } $word;
@@ -45,6 +68,12 @@ sub translate {
 	return @result;
 }
 
+=head2 get_google
+
+also stuff here..
+
+=cut
+
 sub get_google {
     my ($self, $word) = @_;
     my $url = $self->url_encode(
@@ -55,6 +84,12 @@ sub get_google {
         translated => $json->{responseData}->{translatedText}
     };
 }
+
+=head2 get_daum
+
+also stuff here..
+
+=cut
 
 sub get_daum {
     my ($self, $word) = @_;
@@ -71,6 +106,12 @@ sub get_daum {
     return @translated;
 }
 
+=head2 translated_to_json
+
+also stuff here..
+
+=cut
+
 sub translated_to_json {
     my ($self, $url) = @_;
     my $request  = HTTP::Request->new( GET => $url );
@@ -80,11 +121,23 @@ sub translated_to_json {
     return decode_json( $response->content );
 }
 
+=head2 url_encode
+
+url_encode stuff here..
+
+=cut
+
 sub url_encode {
     my ($self, $url) = @_;
     $url =~ s/([^A-Za-z0-9:\/?&]=)/sprintf("%%%02X", ord($1))/seg;
     return $url;
 }
+
+=head2 url_decode
+
+url_decode stuff here..
+
+=cut
 
 sub url_decode {
     my ($self, $url) = @_;
@@ -94,29 +147,6 @@ sub url_decode {
 
 __PACKAGE__->meta->make_immutable;
 
-
-
-=pod
-
-=head1 NAME
-
-App::eng2kor
-
-=head1 VERSION
-
-version 1.010
-
-=head1 SYNOPSIS
-
-	use App::eng2kor;
-	my $app = new App::eng2kor;
-	binmode STDOUT, ':encoding(UTF-8)';
-	my @result = $app->translate('some');
-	for my $item (@result) {
-		print $item->{origin}, "\n";
-		print "\t$item->{translated}\n";
-	}
-
 =head1 SEE ALSO
 
 * L<http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11>
@@ -124,9 +154,5 @@ version 1.010
 * L<http://code.google.com/intl/en/apis/ajaxlanguage/>
 
 =cut
-
-
-__END__
-
 
 1;

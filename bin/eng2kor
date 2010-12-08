@@ -1,5 +1,38 @@
 #!/usr/bin/env perl
-package main;
+package eng2kor;
+
+=head1 SYNOPSIS
+
+	eng2kor [--help|-h] [--list|-l] [--src|-s] [--dst|-d] [--reverse|-r] ARG[1] ARG[2] .. ARG[N]
+	    --help, -h        show this message
+	    --list, -l        show set src and dst
+	    --src, -s         source lang, default 'en', but you can change default via ENV{E2K_SRC}
+	    --dst, -d         destination lang, default 'ko', but you can change default via ENV{E2K_DST}
+	    --reverse, -r     swap 'src' and 'dst'
+
+	see below command for more detail.
+	$ perldoc -t eng2kor
+	$ perldoc -t App::eng2kor
+
+	### example
+	eng2kor -h                                                          # show help message
+	eng2kor -l                                                          # show set src and dst
+	eng2kor english                                                     # English to Korean
+	eng2kor hello world                                                 # multiple
+	eng2kor "this is a sentence"                                        # sentence
+	eng2kor http://twitter.com/userid/status/12345678910                # twitter translate    * note: only for twitter status
+	eng2kor --src=ko --dst=en 안녕하세요                                # Korean to English
+	eng2kor -s ja こんにちは                                            # Japanese to Korean
+	eng2kor -r 안녕하세요                                               # swap 'src' and 'dst'
+	echo "word" | eng2kor                                               # use STDIN to ARG
+	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # set your own DAUM_ENDIC_KEY    * note: just example, invalid key
+
+	### add below line to your .vimrc
+	set keywordprg=eng2kor                                              # type 'Shift + k' on a word what you find.
+	map <C-e> :!eng2kor                                                 # type 'Ctrl + e'
+
+=cut
+
 use strict;
 use warnings;
 use utf8;
@@ -37,42 +70,6 @@ for my $word (@ARGV) {
     }
 }
 
-__END__
-
-=head1 NAME
-
-eng2kor - English to Korean Dictionary for tty
-
-=head1 SYNOPSIS
-
-	eng2kor [--help|-h] [--list|-l] [--src|-s] [--dst|-d] [--reverse|-r] ARG[1] ARG[2] .. ARG[N]
-	    --help, -h        show this message
-	    --list, -l        show set src and dst
-	    --src, -s         source lang, default 'en', but you can change default via ENV{E2K_SRC}
-	    --dst, -d         destination lang, default 'ko', but you can change default via ENV{E2K_DST}
-	    --reverse, -r     swap 'src' and 'dst'
-
-	see below command for more detail.
-	$ perldoc -t eng2kor
-	$ perldoc -t App::eng2kor
-
-	### example
-	eng2kor -h                                                          # show help message
-	eng2kor -l                                                          # show set src and dst
-	eng2kor english                                                     # English to Korean
-	eng2kor hello world                                                 # multiple
-	eng2kor "this is a sentence"                                        # sentence
-	eng2kor http://twitter.com/userid/status/12345678910                # twitter translate    * note: only for twitter status
-	eng2kor --src=ko --dst=en 안녕하세요                                # Korean to English
-	eng2kor -s ja こんにちは                                            # Japanese to Korean
-	eng2kor -r 안녕하세요                                               # swap 'src' and 'dst'
-	echo "word" | eng2kor                                               # use STDIN to ARG
-	export DAUM_ENDIC_KEY=e4208a9e48744c40f2b7459162062313ed9878f6      # set your own DAUM_ENDIC_KEY    * note: just example, invalid key
-
-	### add below line to your .vimrc
-	set keywordprg=eng2kor                                              # type 'Shift + k' on a word what you find.
-	map <C-e> :!eng2kor                                                 # type 'Ctrl + e'
-
 =head1 SEE ALSO
 
 * L<http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11>
@@ -81,4 +78,4 @@ eng2kor - English to Korean Dictionary for tty
 
 =cut
 
-1; # End of eng2kor
+1;
