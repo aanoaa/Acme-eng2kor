@@ -41,7 +41,7 @@ use Pod::Usage;
 use Getopt::Long;
 use App::eng2kor;
 
-if ( $^O =~ m/win/i ) { # for Windows
+if ( $^O =~ m/MSWin32/i ) { # for Windows
     binmode STDIN,  ':encoding(euc-kr)';
     binmode STDOUT, ':encoding(euc-kr)';
     @ARGV = map { decode( 'euc-kr', $_ ) } @ARGV;
