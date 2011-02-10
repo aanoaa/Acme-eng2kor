@@ -1,9 +1,9 @@
-package App::eng2kor;
+package Acme::eng2kor;
 # ABSTRACT: English to Korean Translator
 
 =head1 SYNOPSIS
 
-	use App::eng2kor;
+	use Acme::eng2kor;
 	my $app = new App::eng2kor;
 	binmode STDOUT, ':encoding(UTF-8)';
 	my @result = $app->translate('some');

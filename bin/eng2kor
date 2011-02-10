@@ -39,7 +39,7 @@ use utf8;
 use Encode qw/encode decode/;
 use Pod::Usage;
 use Getopt::Long;
-use App::eng2kor;
+use Acme::eng2kor;
 
 if ( $^O =~ m/MSWin32/i ) { # for Windows
     binmode STDIN,  ':encoding(euc-kr)';
