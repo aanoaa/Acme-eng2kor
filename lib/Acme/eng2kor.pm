@@ -1,155 +1,245 @@
 package Acme::eng2kor;
 # ABSTRACT: English to Korean Translator
 
+=encoding utf-8
+
 =head1 SYNOPSIS
 
-	use Acme::eng2kor;
-	my $app = new App::eng2kor;
-	binmode STDOUT, ':encoding(UTF-8)';
-	my @result = $app->translate('some');
-	for my $item (@result) {
-		print $item->{origin}, "\n";
-		print "\t$item->{translated}\n";
-	}
+    use utf8;
+    use Acme::eng2kor;
+    binmode STDOUT, ':encoding(UTF-8)';
+    my $app = Acme::eng2kor->new;
+    $app->translate('hello');
+    print $app->text, "\n";         # hello
+    print $app->translated, "\n";   # 안녕하세요
 
 =head1 DESCRIPTION
 
-Description here..
+Yet Another Translator
 
 =cut
 
+use utf8;
 use Any::Moose;
 use Any::Moose '::Util::TypeConstraints';
 use JSON qw/decode_json/;
 use Const::Fast;
-use Encode qw/decode/;
+use URI::Escape qw/uri_escape_utf8/;
 use HTTP::Request;
 use HTTP::Response;
 use LWP::UserAgent;
 use namespace::autoclean;
 
-const my $DAUM_ENDIC_URL =>
-  "http://apis.daum.net/dic/endic?apikey=%s&kind=WORD&output=json&q=%s";
-const my $DAUM_ENDIC_DEMO_KEY =>
-  "DAUM_DIC_DEMO_APIKEY";
-const my $GOOGLE_TRANSLATE_API_URL =>
-  "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s";
+const my $GOOGLE_TRANSLATE_API_URL => "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=%s&langpair=%s";
+const my @SUPPORT_LANG_TAGS => qw/ach af ak am ar az be bem bg bh bn br bs ca co cs cy da de el en eo es et eu fa fi fo fr fy ga gd gl gn gu ha haw hi hr ht hu hy ia id ig is it iw ja jw ka kg kk km kn ko ku ky la lg ln lo lt lua lv mfe mg mi mk ml mn mo mr ms mt ne nl nn no ny nyn oc om or pa pl ps qu rm rn ro ru rw sd sh si sk sl sn so sq sr st su sv sw ta te tg th ti tk tl tn to tr tt tw ug uk ur uz vi wo xh yi yo zu/;
 
-subtype 'LangTags' => as 'Str' =>
-  where { m/[a-zA-Z\-]+/ };  # en, en-US, ja ...
+subtype 'LangTags'
+    => as 'Str'
+    => where { my $lang = $_; grep { /^$lang$/ } @SUPPORT_LANG_TAGS; };
 
-has 'src' => ( is => 'rw', isa => 'LangTags', default => 'en' );
-has 'dst' => ( is => 'rw', isa => 'LangTags', default => 'ko' );
+has 'src' => (
+    is => 'rw',
+    isa => 'LangTags',
+    default => 'en'
+);
+
+has 'dst' => (
+    is => 'rw',
+    isa => 'LangTags',
+    default => 'ko'
+);
+
+has 'text' => (
+    is => 'rw',
+    isa => 'Str'
+);
+
+has 'translated' => (
+    is => 'rw',
+    isa => 'Str'
+);
 
 =head1 METHODS
 
 =head2 translate
 
-stuff here..
+Internal interface
 
 =cut
 
 sub translate {
     my ($self, $word) = @_;
-	map { s/^\s+//; s/\s+$// } $word;
-	die "wrong argument!\n" if length($word) == 0;
-	if ($word =~ m{^\s*http://twitter.com/\w+/status/[0-9]+$}) {
-		my $request  = HTTP::Request->new( GET => $word );
-		my $ua       = LWP::UserAgent->new;
-		my $response = $ua->request($request);
-		die STDERR $response->status_line, "\n" unless $response->is_success;
-		($word) = $response->content =~ m{<meta content="(.*?)" name="description" />};
-		$word = decode('UTF-8', $word);
-	}
-
-	my @result;
-	push @result, $self->get_google($word);
-	push @result, $self->get_daum($word);
-	return @result;
+    map { s/^\s+//; s/\s+$// } $word if defined $word;
+    return $self->_google_translate($word);
 }
 
-=head2 get_google
+=head2 _google_translate
 
-also stuff here..
+Used google translate api
 
 =cut
 
-sub get_google {
+sub _google_translate {
     my ($self, $word) = @_;
-    my $url = $self->url_encode(
-        sprintf( $GOOGLE_TRANSLATE_API_URL, $word, $self->{src} . '|' . $self->{dst} ) );
-    my $json = $self->translated_to_json($url);
-    return {
-        origin     => $word,
-        translated => $json->{responseData}->{translatedText}
-    };
+    $self->text($word) if defined $word;
+    my $text = uri_escape_utf8($self->text);
+    my $escaped_uri = sprintf($GOOGLE_TRANSLATE_API_URL, $text, $self->src . '|' . $self->dst);
+    my $json = $self->get_json($escaped_uri);
+    $self->translated($json->{responseData}{translatedText});
+    return { origin => $self->text, translated => $self->translated };
 }
 
-=head2 get_daum
+=head2 get_json
 
-also stuff here..
+Return decoded json text after HTTP IO.
 
 =cut
 
-sub get_daum {
-    my ($self, $word) = @_;
-    $ENV{DAUM_ENDIC_KEY} = $DAUM_ENDIC_DEMO_KEY unless $ENV{DAUM_ENDIC_KEY};
-    my $url = $self->url_encode(
-        sprintf( $DAUM_ENDIC_URL, $ENV{DAUM_ENDIC_KEY}, $word ) );
-    my $json = $self->translated_to_json($url);
-    my @translated;
-    for my $item ( @{ $json->{channel}->{item} } ) {
-        push @translated,
-          { origin => $item->{title}, translated => $item->{description} };
-    }
-
-    return @translated;
-}
-
-=head2 translated_to_json
-
-also stuff here..
-
-=cut
-
-sub translated_to_json {
+sub get_json {
     my ($self, $url) = @_;
-    my $request  = HTTP::Request->new( GET => $url );
-    my $ua       = LWP::UserAgent->new;
-    my $response = $ua->request($request);
-    die STDERR $response->status_line, "\n" unless $response->is_success;
-    return decode_json( $response->content );
-}
-
-=head2 url_encode
-
-url_encode stuff here..
-
-=cut
-
-sub url_encode {
-    my ($self, $url) = @_;
-    $url =~ s/([^A-Za-z0-9:\/?&]=)/sprintf("%%%02X", ord($1))/seg;
-    return $url;
-}
-
-=head2 url_decode
-
-url_decode stuff here..
-
-=cut
-
-sub url_decode {
-    my ($self, $url) = @_;
-    $url =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg;
-    return $url;
+    my $req = HTTP::Request->new( GET => $url );
+    my $ua  = LWP::UserAgent->new;
+    my $res = $ua->request($req);
+    die $res->status_line, "\n" unless $res->is_success;
+    return decode_json($res->content);
 }
 
 __PACKAGE__->meta->make_immutable;
 
-=head1 SEE ALSO
+=head1 SUPPORT LANGUAGES
 
-* L<http://dna.daum.net/griffin/do/DevDocs/read?bbsId=DevDocs&articleId=11>
+Google translate available language list is below.
+
+    ach: Luo
+    af: Afrikaans
+    ak: Akan
+    am: Amharic
+    ar: Arabic
+    az: Azerbaijani
+    be: Belarusian
+    bem: Bemba
+    bg: Bulgarian
+    bh: Bihari
+    bn: Bengali
+    br: Breton
+    bs: Bosnian
+    ca: Catalan
+    co: Corsican
+    cs: Czech
+    cy: Welsh
+    da: Danish
+    de: German
+    el: Greek
+    en: English
+    eo: Esperanto
+    es: Spanish
+    et: Estonian
+    eu: Basque
+    fa: Persian
+    fi: Finnish
+    fo: Faroese
+    fr: French
+    fy: Frisian
+    ga: Irish
+    gd: Scots Gaelic
+    gl: Galician
+    gn: Guarani
+    gu: Gujarati
+    ha: Hausa
+    haw: Hawaiian
+    hi: Hindi
+    hr: Croatian
+    ht: Haitian Creole
+    hu: Hungarian
+    hy: Armenian
+    ia: Interlingua
+    id: Indonesian
+    ig: Igbo
+    is: Icelandic
+    it: Italian
+    iw: Hebrew
+    ja: Japanese
+    jw: Javanese
+    ka: Georgian
+    kg: Kongo
+    kk: Kazakh
+    km: Cambodian
+    kn: Kannada
+    ko: Korean
+    ku: Kurdish
+    ky: Kyrgyz
+    la: Latin
+    lg: Luganda
+    ln: Lingala
+    lo: Laothian
+    lt: Lithuanian
+    lua: Tshiluba
+    lv: Latvian
+    mfe: Mauritian Creole
+    mg: Malagasy
+    mi: Maori
+    mk: Macedonian
+    ml: Malayalam
+    mn: Mongolian
+    mo: Moldavian
+    mr: Marathi
+    ms: Malay
+    mt: Maltese
+    ne: Nepali
+    nl: Dutch
+    nn: Norwegian (Nynorsk)
+    no: Norwegian
+    ny: Chichewa
+    nyn: Runyakitara
+    oc: Occitan
+    om: Oromo
+    or: Oriya
+    pa: Punjabi
+    pl: Polish
+    ps: Pashto
+    qu: Quechua
+    rm: Romansh
+    rn: Kirundi
+    ro: Romanian
+    ru: Russian
+    rw: Kinyarwanda
+    sd: Sindhi
+    sh: Serbo-Croatian
+    si: Sinhalese
+    sk: Slovak
+    sl: Slovenian
+    sn: Shona
+    so: Somali
+    sq: Albanian
+    sr: Serbian
+    st: Sesotho
+    su: Sundanese
+    sv: Swedish
+    sw: Swahili
+    ta: Tamil
+    te: Telugu
+    tg: Tajik
+    th: Thai
+    ti: Tigrinya
+    tk: Turkmen
+    tl: Filipino
+    tn: Setswana
+    to: Tonga
+    tr: Turkish
+    tt: Tatar
+    tw: Twi
+    ug: Uighur
+    uk: Ukrainian
+    ur: Urdu
+    uz: Uzbek
+    vi: Vietnamese
+    wo: Wolof
+    xh: Xhosa
+    yi: Yiddish
+    yo: Yoruba
+    zu: Zulu
+
+=head1 SEE ALSO
 
 * L<http://code.google.com/intl/en/apis/ajaxlanguage/>
 
