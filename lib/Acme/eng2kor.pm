@@ -86,7 +86,7 @@ sub _google_translate {
     my $escaped_uri = sprintf($GOOGLE_TRANSLATE_API_URL, $text, $self->src . '|' . $self->dst);
     my $json = $self->get_json($escaped_uri);
     $self->translated($json->{responseData}{translatedText});
-    return { origin => $self->text, translated => $self->translated };
+    return $json;
 }
 
 =head2 get_json
