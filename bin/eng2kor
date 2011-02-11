@@ -2,8 +2,6 @@
 package eng2kor;
 # ABSTRACT: App::eng2kor CLI
 
-=encoding utf-8
-
 =head1 SYNOPSIS
 
 	eng2kor [--help|-h] [--list|-l] [--src|-s] [--dst|-d] [--reverse|-r] ARGS...
