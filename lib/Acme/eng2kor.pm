@@ -1,8 +1,6 @@
 package Acme::eng2kor;
 # ABSTRACT: English to Korean Translator
 
-=encoding utf-8
-
 =head1 SYNOPSIS
 
     use utf8;
