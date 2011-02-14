@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package eng2kor;
-# ABSTRACT: App::eng2kor CLI
+# ABSTRACT: Acme::eng2kor CLI
 
 =head1 SYNOPSIS
 
